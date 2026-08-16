@@ -16,7 +16,6 @@ import { AquaPluginCard, type AquaPluginCardInjected } from './AquaPluginCard.ts
 import { createAquaRowStore, type AquaSettingsPayload } from './settings-store.ts'
 import { en, NS, zh } from './locales.ts'
 import { AquaLayer } from './theme-layer.ts'
-import { registerAquaPet } from './pet/index.ts'
 // Side-effect imports: the theme-layer stylesheet (unloaded with the plugin)
 // and the self-hosted Space Grotesk @font-face (no shell dependency).
 import './aqua.module.css'
@@ -152,8 +151,4 @@ export function apply(ctx: ClientContext): void {
     locale: NS,
     inject: pluginInjected,
   }, AquaPluginCard))
-
-  // The desktop pet (multi-pet engine; independent of the theme master
-  // switch — it owns its visibility toggle on its settings page).
-  registerAquaPet(ctx)
 }

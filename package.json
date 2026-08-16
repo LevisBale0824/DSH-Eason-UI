@@ -1,7 +1,7 @@
 {
   "name": "@deepseek-ai/dsh-client-ui-aqua",
-  "description": "Aqua: a highly customizable glassmorphism theme with a multi-pet desktop companion — adjustable blur, frost, fluid or wallpaper backdrop, unified corners, motion, and switchable pet packs (Eason first)",
-  "version": "1.5.0",
+  "description": "Aqua: a highly customizable glassmorphism theme — adjustable blur, frost, fluid or lossless wallpaper backdrop (interactive crop), unified corners and motion",
+  "version": "1.6.0",
   "publishConfig": {
     "access": "public"
   },
@@ -46,8 +46,7 @@
   },
   "scripts": {
     "bundle": "tsdown",
-    "watch": "tsdown --watch",
-    "prepack": "node scripts/check-pets.mjs"
+    "watch": "tsdown --watch"
   },
   "license": "MIT",
   "peerDependencies": {
@@ -87,7 +86,6 @@
     "lib/invariant.js",
     "lib/client.js",
     "lib/types/**/*.d.ts",
-    "assets/pets",
     "cordis.patch.yml"
   ]
 }

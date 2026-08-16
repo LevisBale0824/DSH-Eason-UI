@@ -1,5 +1,5 @@
 # ============================================================================
-# Aqua（主题 + 桌宠）的 bundle patch —— 把插件挂进 DSH 配置树
+# Aqua（玻璃主题）的 bundle patch —— 把插件挂进 DSH 配置树
 # ============================================================================
 #
 # 【这是什么】
@@ -9,10 +9,8 @@
 #
 # 【config 说明】
 #   config 传给宿主半侧 apply(ctx, config)：
-#   - extraPetRoots：额外的宠物包根目录（绝对路径数组，可选）
-#   - homeRoot：用户宠物投放区（默认 $DSH_HOME/aqua-pets，一般不用改）
-#   浏览器半侧收不到这些配置（DSH 客户端管线限制）；宠物运行时设置在
-#   设置面板「桌宠」页，持久化在 localStorage（键 aqua-pet.*）。
+#   - wallpaperRoot：壁纸存储目录（默认 $DSH_HOME/aqua-wallpaper，一般不用改）
+#   浏览器半侧收不到这些配置（DSH 客户端管线限制）。
 #
 # ============================================================================
 
@@ -20,5 +18,4 @@
     - id: ui-aqua                       # 插件行 id（与宿主半侧 name 一致）
       name: '@deepseek-ai/dsh-client-ui-aqua'  # 模块名：解析到 lib/index.js
       # config:
-      #   extraPetRoots: []             # 例：['D:/code/more-pets']
-      #   homeRoot: ''                  # 例：覆盖默认投放区路径
+      #   wallpaperRoot: ''             # 例：覆盖默认壁纸存储路径
