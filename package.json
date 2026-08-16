@@ -1,5 +1,5 @@
 {
-  "name": "@deepseek-ai/dsh-client-ui-aqua",
+  "name": "@levisbale0824/dsh-client-ui-aqua",
   "description": "Aqua: a highly customizable glassmorphism theme — adjustable blur, frost, fluid or lossless wallpaper backdrop (interactive crop), unified corners and motion",
   "version": "1.6.0",
   "publishConfig": {
@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/WYH66666666/DSH.git"
+    "url": "git+https://github.com/LevisBale0824/DSH-Eason-UI.git"
   },
   "type": "module",
   "main": "lib/index.js",

@@ -8,7 +8,7 @@ $ErrorActionPreference = 'Stop'
 
 $repo  = 'D:\Hermes Work\DSH'
 $mono  = 'D:\Hermes Work\deepseek-harness\packages\client\ui-aqua'
-$clone = 'C:\Users\wuyuh\.dsh\plugins\@deepseek-ai\dsh-client-ui-aqua'
+$clone = 'C:\Users\wuyuh\.dsh\plugins\@levisbale0824\dsh-client-ui-aqua'
 
 Write-Host '[1/3] Copying source into monorepo build copy...'
 Copy-Item "$repo\src\client\*" "$mono\src\client\" -Force -Recurse
@@ -21,7 +21,7 @@ Copy-Item "$repo\tsconfig.json" "$mono\tsconfig.json" -Force
 Write-Host '[2/3] Bundling...'
 Push-Location 'D:\Hermes Work\deepseek-harness'
 try {
-    pnpm --filter @deepseek-ai/dsh-client-ui-aqua run bundle
+    pnpm --filter @levisbale0824/dsh-client-ui-aqua run bundle
     if ($LASTEXITCODE -ne 0) { throw "bundle failed (exit $LASTEXITCODE)" }
 } finally {
     Pop-Location

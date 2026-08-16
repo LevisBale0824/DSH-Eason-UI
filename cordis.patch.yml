@@ -16,6 +16,6 @@
 
 - insert:
     - id: ui-aqua                       # 插件行 id（与宿主半侧 name 一致）
-      name: '@deepseek-ai/dsh-client-ui-aqua'  # 模块名：解析到 lib/index.js
+      name: '@levisbale0824/dsh-client-ui-aqua'  # 模块名：解析到 lib/index.js
       # config:
       #   wallpaperRoot: ''             # 例：覆盖默认壁纸存储路径

@@ -1,4 +1,4 @@
-# @deepseek-ai/dsh-client-ui-aqua
+# @levisbale0824/dsh-client-ui-aqua
 
 [English](README.md) | 中文
 
@@ -27,7 +27,7 @@ Aqua 是一层高自由度的玻璃质感主题，套在 DeepSeek Harness 网页
 ### Windows（一条命令）
 
 ```powershell
-powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest 'https://github.com/WYH66666666/DSH-Transparent-UI-Plugin/raw/main/install.ps1' -OutFile install.ps1; .\install.ps1"
+powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest 'https://github.com/LevisBale0824/DSH-Eason-UI/raw/main/install.ps1' -OutFile install.ps1; .\install.ps1"
 ```
 
 默认安装**最新发布版**。不需要装 git，安装器会退回到直接下载 zip。脚本会把插件链接进 profile 的 `node_modules`，并在 `cordis.patch.yml` 里登记 `ui-aqua`（幂等，重复跑不会重复登记）。刷新 Web 界面即可。
@@ -42,8 +42,8 @@ powershell -ExecutionPolicy Bypass -Command "Invoke-WebRequest 'https://github.c
 ### macOS / Linux（手动，三步）
 
 ```sh
-git clone --depth 1 --branch v1.1.0 https://github.com/WYH66666666/DSH-Transparent-UI-Plugin.git
-ln -s "$PWD/DSH" "$DSH_HOME/profiles/node_modules/@deepseek-ai/dsh-client-ui-aqua"
+git clone --depth 1 --branch v1.1.0 https://github.com/LevisBale0824/DSH-Eason-UI.git
+ln -s "$PWD/DSH-Eason-UI" "$DSH_HOME/profiles/node_modules/@levisbale0824/dsh-client-ui-aqua"
 ```
 
 然后往 `$DSH_HOME/profiles/web/cordis.patch.yml` 追加：
@@ -51,7 +51,7 @@ ln -s "$PWD/DSH" "$DSH_HOME/profiles/node_modules/@deepseek-ai/dsh-client-ui-aqu
 ```yaml
 - insert:
     - id: ui-aqua
-      name: '@deepseek-ai/dsh-client-ui-aqua'
+      name: '@levisbale0824/dsh-client-ui-aqua'
 ```
 
 ## 使用

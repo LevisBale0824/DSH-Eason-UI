@@ -3,6 +3,7 @@
 ## v1.6.0
 
 - **移除桌宠功能**：v1.2.0 并入的多宠物桌宠（`/aqua-pet` 路由、宠物包、设置「桌宠」页、`scripts/check-pets.mjs` 门禁与全部 Eason 素材）整体移除——桌宠已独立成单独插件维护，本包回归纯玻璃主题；壁纸无损存储、交互式裁剪、设置收纳等其余功能不受影响
+- **包迁移到自有 npm scope**：`@deepseek-ai/dsh-client-ui-aqua` → `@levisbale0824/dsh-client-ui-aqua`（官方 scope 无发布权限）；安装脚本/文档默认源同步指向本仓库，客户端 bundle 的 loader id 随包名重建
 
 ## v1.5.0
 
