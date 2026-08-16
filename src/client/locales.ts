@@ -14,6 +14,7 @@ export const zh = {
   'aqua.modeCompat': '兼容模式',
   'aqua.modeHint': '兼容模式保持原版排版，只把材质换成玻璃，其他插件的界面也会自动玻璃化',
   'aqua.whale': '粒子鲸鱼',
+  'aqua.critters': '小鱼',
   'aqua.blur': '玻璃模糊度',
   'aqua.frost': '磨砂度',
   'aqua.fluidHue': '背景流体颜色',
@@ -26,6 +27,7 @@ export const zh = {
   'aqua.wallpaper': '壁纸',
   'aqua.wallpaperHint': '浅色壁纸用浅色模式，深色壁纸用深色模式⚠️',
   'aqua.chooseWallpaper': '选择图片',
+  'aqua.deleteWallpaper': '删除',
   'aqua.wallpaperBlur': '壁纸模糊度',
   'aqua.wallpaperFrost': '壁纸磨砂度',
 } satisfies Record<string, string>
@@ -50,6 +52,7 @@ export const en = {
   'aqua.modeCompat': 'Compatibility',
   'aqua.modeHint': 'Compatibility keeps the stock layout and only swaps the material to glass — other plugins\' UI turns glass too',
   'aqua.whale': 'Particle whale',
+  'aqua.critters': 'Fish',
   'aqua.blur': 'Glass blur',
   'aqua.frost': 'Frost',
   'aqua.fluidHue': 'Fluid color',
@@ -62,6 +65,7 @@ export const en = {
   'aqua.wallpaper': 'Wallpaper',
   'aqua.wallpaperHint': 'Use light mode for light wallpapers, dark mode for dark wallpapers ⚠️',
   'aqua.chooseWallpaper': 'Choose image',
+  'aqua.deleteWallpaper': 'Delete',
   'aqua.wallpaperBlur': 'Wallpaper blur',
   'aqua.wallpaperFrost': 'Wallpaper frost',
 } satisfies Record<AquaLocaleKey, string>

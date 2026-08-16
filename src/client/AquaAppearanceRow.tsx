@@ -36,6 +36,8 @@ export interface AquaAppearanceRowInjected {
   setWallpaper: (value: string) => void
   /** Set the particle-whale flag. */
   setWhale: (value: boolean) => void
+  /** Set the ambient marine-life flag. */
+  setCritters: (value: boolean) => void
   /** Set the wallpaper blur radius, px. */
   setWallpaperBlur: (value: number) => void
   /** Set the wallpaper frost veil, 0-100. */
@@ -55,7 +57,7 @@ export type AquaAppearanceRowComponentProps =
 export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
   const {
     t, setMode, setBlur, setFrost, setFluidHue, setBgBrightness,
-    setBackground, setWallpaper, setWhale, setWallpaperBlur, setWallpaperFrost, useStore,
+    setBackground, setWallpaper, setWhale, setCritters, setWallpaperBlur, setWallpaperFrost, useStore,
   } = props
   const enabled = useStore(s => s.enabled)
   const mode = useStore(s => s.mode)
@@ -66,6 +68,8 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
   const dark = useStore(s => s.dark)
   const background = useStore(s => s.background)
   const whale = useStore(s => s.whale)
+  const critters = useStore(s => s.critters)
+  const wallpaper = useStore(s => s.wallpaper)
   const wallpaperBlur = useStore(s => s.wallpaperBlur)
   const wallpaperFrost = useStore(s => s.wallpaperFrost)
   const fileRef = useRef<HTMLInputElement | null>(null)
@@ -110,6 +114,18 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
               {whale && <IconCheckOutline16 />}
             </span>
             {whale ? t('aqua.enable') : t('aqua.disable')}
+          </button>
+          <span className={css.inlineLabel}>{t('aqua.critters')}</span>
+          <button
+            type="button"
+            className={critters ? css.toggleOn : css.toggle}
+            aria-pressed={critters}
+            onClick={() => { setCritters(!critters) }}
+          >
+            <span className={css.check}>
+              {critters && <IconCheckOutline16 />}
+            </span>
+            {critters ? t('aqua.enable') : t('aqua.disable')}
           </button>
         </div>
 
@@ -159,6 +175,11 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
                 <button type="button" className={css.pickButton} onClick={() => { fileRef.current?.click() }}>
                   {t('aqua.chooseWallpaper')}
                 </button>
+                {wallpaper !== '' && (
+                  <button type="button" className={css.deleteButton} onClick={() => { setWallpaper('') }}>
+                    {t('aqua.deleteWallpaper')}
+                  </button>
+                )}
               </div>
             </div>
             <div className={css.knobHint}>{t('aqua.wallpaperHint')}</div>

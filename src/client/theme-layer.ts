@@ -2,10 +2,9 @@
  * Aqua theme layer: one toggleable visual skin over the whole Web surface.
  * Everything this layer owns is an effect — token overrides ride the theme
  * service's override stack, the CSS hooks ride a `data-dsh-aqua` attribute on
- * <html> (the stylesheet only applies under it), the hero copy rides a
- * MutationObserver that decorates new [data-hero-headline] mounts — so
- * switching the flag off (or unloading the plugin) restores the stock UI
- * exactly: no residue, no reload.
+ * <html> (the stylesheet only applies under it), the ambient scene and page
+ * fades are mounted/removed with the layer — so switching the flag off (or
+ * unloading the plugin) restores the stock UI exactly: no residue, no reload.
  *
  * The enable flag persists in localStorage: a client-only visual preference
  * (like the selected-session key), written and read by this plugin alone.
@@ -19,7 +18,6 @@ import { attachFluidShader, SITE_FLUID_PARAMS, type FluidParams, type FluidShade
 import { attachFluidInteractions } from './fluid-interactions.ts'
 import { startSeamStamper } from './seam-stamper.ts'
 import { mountWhale, type WhaleHandle } from './whale.ts'
-import { startWordmarkBadge, type BadgeHandle } from './wordmark-badge.ts'
 
 /** html attribute selecting the Aqua layer: CSS hooks and ambient effects. */
 export const AQUA_ATTRIBUTE = 'data-dsh-aqua'
@@ -230,6 +228,8 @@ export interface AquaSettings {
   wallpaper: string
   /** Particle whale in the chat area center (the harness hero fish). */
   whale: boolean
+  /** Ambient marine life (fish / bubbles / plankton). */
+  critters: boolean
   /** Wallpaper blur radius, px. */
   wallpaperBlur: number
   /** Wallpaper frost veil, 0-100. */
@@ -245,6 +245,7 @@ const SETTINGS_DEFAULTS: AquaSettings = {
   background: 'fluid',
   wallpaper: '',
   whale: true,
+  critters: true,
   wallpaperBlur: 0,
   wallpaperFrost: 0,
 }
@@ -264,6 +265,7 @@ const MODE_KEY = 'dsh.ui-aqua.mode'
 const BACKGROUND_KEY = 'dsh.ui-aqua.background'
 const WALLPAPER_KEY = 'dsh.ui-aqua.wallpaper'
 const WHALE_KEY = 'dsh.ui-aqua.whale'
+const CRITTERS_KEY = 'dsh.ui-aqua.critters'
 
 /** Clamp a numeric knob into its sane range. */
 function clampSetting(key: NumericKey, value: number): number {
@@ -368,6 +370,25 @@ function writeWhale(value: boolean): void {
   }
 }
 
+/** Read the critters flag (absent means on). */
+function readCritters(): boolean {
+  try {
+    const raw = localStorage.getItem(CRITTERS_KEY)
+    return raw === null ? true : raw === 'true'
+  } catch {
+    return true
+  }
+}
+
+/** Persist the critters flag. */
+function writeCritters(value: boolean): void {
+  try {
+    localStorage.setItem(CRITTERS_KEY, String(value))
+  } catch {
+    /* in-memory state still applies for this tab */
+  }
+}
+
 /** Fluid palettes: one unified full-screen water. Dark inverts the official
  *  light look with luminous accent cores; light keeps strong blue contrast. */
 const FLUID_PALETTES: Record<'light' | 'dark', FluidParams> = {
@@ -397,8 +418,8 @@ function activeScheme(): 'light' | 'dark' {
 /**
  * Owns the Aqua layer lifecycle: reads the durable enable flag, and applies /
  * retracts every layer on change. Cross-tab flips arrive through the storage
- * event; the greeting observer and every subscription are released when the
- * plugin fiber is disposed.
+ * event; every subscription and mounted effect are released when the plugin
+ * fiber is disposed.
  */
 export class AquaLayer {
   private enabled = false
@@ -411,7 +432,6 @@ export class AquaLayer {
   private themeListener: (() => void) | undefined
   private seamDisposer: (() => void) | undefined
   private whaleHandle: WhaleHandle | undefined
-  private badgeHandle: BadgeHandle | undefined
   private readonly ctx: Context
 
   /**
@@ -426,7 +446,7 @@ export class AquaLayer {
           this.sync()
         }
         const key = event.key
-        if (key !== null && (key in NUMERIC_KEYS || key === BACKGROUND_KEY || key === WALLPAPER_KEY || key === MODE_KEY || key === WHALE_KEY)) {
+        if (key !== null && (key in NUMERIC_KEYS || key === BACKGROUND_KEY || key === WALLPAPER_KEY || key === MODE_KEY || key === WHALE_KEY || key === CRITTERS_KEY)) {
           this.reloadSettings()
           if (this.enabled) { this.applySettings(); this.applyTokens(); this.syncWhale() }
         }
@@ -438,7 +458,6 @@ export class AquaLayer {
       this.themeListener = this.ctx.on('theme/change', () => {
         this.dark = this.resolveScheme()
         this.whaleHandle?.setDark(this.dark)
-        this.badgeHandle?.setDark(this.dark)
         if (this.enabled) {
           this.applySettings()
           this.applyFluidPalettes()
@@ -492,6 +511,7 @@ export class AquaLayer {
       background: readBackground(),
       wallpaper: readWallpaper(),
       whale: readWhale(),
+      critters: readCritters(),
       wallpaperBlur: readSetting('wallpaperBlur'),
       wallpaperFrost: readSetting('wallpaperFrost'),
     }
@@ -572,6 +592,14 @@ export class AquaLayer {
     if (this.enabled) this.syncWhale()
   }
 
+  /** Set the ambient marine-life flag (fish / bubbles / plankton). */
+  setCritters(value: boolean): void {
+    if (value === this.settings.critters) return
+    this.settings.critters = value
+    writeCritters(value)
+    if (this.enabled) this.applySettings()
+  }
+
   /** Set the wallpaper blur radius (px). */
   setWallpaperBlur(value: number): void {
     const next = clampSetting('wallpaperBlur', value)
@@ -625,6 +653,7 @@ export class AquaLayer {
     // Backdrop source: flip the ambient container between fluid and wallpaper.
     const ambient = document.querySelector<HTMLElement>('[data-dsh-aqua-ambient]')
     if (ambient !== null) ambient.dataset.background = this.settings.background
+    if (ambient !== null) ambient.dataset.critters = this.settings.critters ? 'on' : 'off'
     const img = document.querySelector<HTMLImageElement>('[data-dsh-aqua-wallpaper-img]')
     if (img !== null) {
       if (this.settings.background === 'wallpaper' && this.settings.wallpaper !== '') {
@@ -653,7 +682,6 @@ export class AquaLayer {
     this.mountFluid()
     this.startSeamStamper()
     this.syncWhale()
-    if (this.badgeHandle === undefined) this.badgeHandle = startWordmarkBadge(this.dark)
   }
 
   /** Mount or drop the particle whale to match enabled + the whale flag. */
@@ -675,8 +703,6 @@ export class AquaLayer {
     document.documentElement.removeAttribute('data-dsh-compat')
     this.whaleHandle?.dispose()
     this.whaleHandle = undefined
-    this.badgeHandle?.dispose()
-    this.badgeHandle = undefined
     this.tokenDisposer?.()
     this.tokenDisposer = undefined
     this.teardownFluid()

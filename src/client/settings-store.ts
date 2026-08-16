@@ -27,6 +27,8 @@ export interface AquaRowState {
   wallpaper: string
   /** Particle whale in the chat area center. */
   whale: boolean
+  /** Ambient marine life (fish / bubbles / plankton). */
+  critters: boolean
   /** Wallpaper blur radius, px. */
   wallpaperBlur: number
   /** Wallpaper frost veil, 0-100. */
@@ -47,6 +49,7 @@ export interface AquaSettingsPayload {
   background: 'fluid' | 'wallpaper'
   wallpaper: string
   whale: boolean
+  critters: boolean
   wallpaperBlur: number
   wallpaperFrost: number
 }
@@ -73,6 +76,7 @@ export function createAquaRowStore(): EngineStoreHandle<AquaRowState, AquaRowAct
       background: 'fluid',
       wallpaper: '',
       whale: true,
+      critters: true,
       wallpaperBlur: 0,
       wallpaperFrost: 0,
       revision: -1,
@@ -90,6 +94,7 @@ export function createAquaRowStore(): EngineStoreHandle<AquaRowState, AquaRowAct
         d.background = next.background
         d.wallpaper = next.wallpaper
         d.whale = next.whale
+        d.critters = next.critters
         d.wallpaperBlur = next.wallpaperBlur
         d.wallpaperFrost = next.wallpaperFrost
         d.revision = revision

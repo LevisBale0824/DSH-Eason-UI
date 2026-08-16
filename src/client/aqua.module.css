@@ -200,8 +200,13 @@
   display: none;
 }
 
-/* Marine life: brand-fish silhouettes, shrimp, bubbles, plankton. Positions,
-   sizes, and per-critter timing arrive inline from the plugin markup. */
+/* Ambient marine life: brand-fish silhouettes, shrimp, bubbles, plankton.
+   Positions, sizes, and per-critter timing arrive inline from the plugin
+   markup. The critters toggle hides the whole group. */
+[data-dsh-aqua] [data-dsh-aqua-ambient][data-critters='off'] [data-aqua-critter] {
+  display: none;
+}
+
 [data-dsh-aqua] [data-aqua-critter] {
   position: absolute;
   color: #7ea4df;
@@ -634,13 +639,6 @@
   bottom: 0;
   -webkit-mask-image: linear-gradient(0deg, black 0%, transparent 100%);
   mask-image: linear-gradient(0deg, black 0%, transparent 100%);
-}
-
-/* ---------- Wordmark badge swap: the decorator stamps the plate rect and
-   the knocked-out HARNESS letterforms with data-dsh-aqua-badge-hidden and
-   overlays the official "Harness" pill; these rules do the hiding. ---------- */
-[data-dsh-aqua] [data-dsh-aqua-badge-hidden] {
-  display: none;
 }
 
 /* ---------- Keyboard focus and text selection (both schemes). ---------- */
