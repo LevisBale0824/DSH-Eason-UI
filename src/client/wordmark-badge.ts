@@ -39,6 +39,7 @@ export interface BadgeHandle {
 export function startWordmarkBadge(dark: boolean): BadgeHandle {
   let raf = 0
   let lastGeo = ''
+  let quietFrames = 0
   let darkMode = dark
 
   const apply = (): void => {
@@ -123,10 +124,18 @@ export function startWordmarkBadge(dark: boolean): BadgeHandle {
       }
     }
     // The wordmark lands after the plugin mounts and the sidebar can be
-    // mid-transition: keep re-applying while the geometry keeps changing,
-    // then settle into a no-op once it is stable (dark mode only).
-    if (darkMode && geo !== lastGeo) {
+    // mid-transition (the grid-track slide is pure CSS — no DOM events).
+    // Keep re-applying while the geometry keeps changing, and only stop
+    // after a run of quiet frames — two equal samples are NOT enough: the
+    // wordmark can sit at 0×0 for a few frames before the slide begins,
+    // and stopping early left the pill frozen at its pre-layout spot.
+    if (!darkMode) return
+    if (geo !== lastGeo) {
       lastGeo = geo
+      quietFrames = 0
+      raf = requestAnimationFrame(apply)
+    } else if (quietFrames < 40) {
+      quietFrames += 1
       raf = requestAnimationFrame(apply)
     }
   }
@@ -135,6 +144,10 @@ export function startWordmarkBadge(dark: boolean): BadgeHandle {
   const observer = new MutationObserver(() => { apply() })
   observer.observe(document.documentElement, { childList: true, subtree: true })
   window.addEventListener('resize', apply)
+  // Any finished CSS transition/animation re-runs one final placement, so
+  // the pill never settles at a mid-flight geometry.
+  document.addEventListener('transitionend', apply, true)
+  document.addEventListener('animationend', apply, true)
   return {
     setDark: (dark: boolean): void => {
       if (darkMode === dark) return
@@ -144,6 +157,8 @@ export function startWordmarkBadge(dark: boolean): BadgeHandle {
     dispose: (): void => {
       observer.disconnect()
       window.removeEventListener('resize', apply)
+      document.removeEventListener('transitionend', apply, true)
+      document.removeEventListener('animationend', apply, true)
       if (raf !== 0) cancelAnimationFrame(raf)
       for (const pill of document.querySelectorAll('[data-dsh-aqua-harness-badge]')) pill.remove()
       for (const el of document.querySelectorAll('[data-dsh-aqua-badge-hidden]')) el.removeAttribute('data-dsh-aqua-badge-hidden')

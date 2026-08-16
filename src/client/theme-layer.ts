@@ -604,6 +604,8 @@ export class AquaLayer {
     // opaque slab (the dark card would otherwise hit 100% and read as solid
     // navy).
     style.setProperty('--dsh-aqua-frost', String(Math.min(this.settings.frost / 50, 1.4)))
+    // The new-session button's frost rides the same knob, +20 points.
+    style.setProperty('--dsh-aqua-surface-frost', String(Math.min((this.settings.frost + 20) / 50, 1.4)))
     style.setProperty('--dsh-aqua-fluid-hue', `${this.settings.fluidHue}deg`)
     style.setProperty('--dsh-aqua-wallpaper-blur', `${this.settings.wallpaperBlur}px`)
     style.setProperty('--dsh-aqua-wallpaper-frost', String(this.settings.wallpaperFrost / 100))

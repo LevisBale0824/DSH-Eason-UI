@@ -112,7 +112,6 @@ export function AquaAppearanceRow(props: AquaAppearanceRowComponentProps) {
             {whale ? t('aqua.enable') : t('aqua.disable')}
           </button>
         </div>
-        <div className={css.knobHint}>{t('aqua.whaleHint')}</div>
 
         {mode === 'mica' && (
           <>

@@ -266,6 +266,31 @@
   border-radius: 14px;
 }
 
+/* The new-session button is glass too: translucent fill + backdrop blur,
+   like the composer attach "+" bead. Its frost rides --dsh-aqua-surface-frost
+   (the frost knob + 20 points, written by the layer), so it always reads
+   noticeably frosted relative to the cards around it. */
+[data-dsh-float] [data-dsh-surface] {
+  background: color-mix(in srgb, rgb(255 255 255) calc(62% * var(--dsh-aqua-surface-frost, 1)), transparent);
+  border: 1px solid rgba(19, 45, 83, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
+}
+
+[data-dsh-float] [data-dsh-surface]:hover:not(:disabled) {
+  background: color-mix(in srgb, rgb(255 255 255) calc(74% * var(--dsh-aqua-surface-frost, 1)), transparent);
+}
+
+[data-dsh-float] body[data-ds-dark-theme] [data-dsh-surface] {
+  background: color-mix(in srgb, rgb(42 46 56) calc(62% * var(--dsh-aqua-surface-frost, 1)), transparent);
+  border-color: rgba(148, 180, 220, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+[data-dsh-float] body[data-ds-dark-theme] [data-dsh-surface]:hover:not(:disabled) {
+  background: color-mix(in srgb, rgb(54 58 70) calc(70% * var(--dsh-aqua-surface-frost, 1)), transparent);
+}
+
 /* Small atoms: menu cells, tooltips, pills. */
 [data-dsh-float] [role='menuitem'],
 [data-dsh-float] [role='tooltip'],
@@ -337,11 +362,13 @@
 }
 
 [data-dsh-float] [data-composer-card] {
+  position: relative;
+  z-index: 8;
   background: var(--dsh-aqua-glass-card-light);
   border: 1px solid rgba(19, 45, 83, 0.26);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 8px 32px rgba(19, 45, 83, 0.12);
+    0 10px 36px rgba(19, 45, 83, 0.16);
   backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
 }
 
@@ -350,7 +377,7 @@
   border: 1px solid rgba(148, 180, 220, 0.32);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 8px 32px rgba(2, 6, 14, 0.4);
+    0 10px 36px rgba(2, 6, 14, 0.5);
 }
 
 /* Fused state: once the stats line is docked underneath, the card's bottom
@@ -396,7 +423,7 @@
   background: var(--dsh-aqua-glass-card-light);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 8px 28px rgba(19, 45, 83, 0.1);
+    0 10px 34px rgba(19, 45, 83, 0.16);
   backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
 }
 
@@ -410,13 +437,25 @@
   background: var(--dsh-aqua-glass-card-dark);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 6px 24px rgba(2, 6, 14, 0.22);
+    0 8px 30px rgba(2, 6, 14, 0.32);
+}
+
+/* Collapsed: the floating rail reaches 12px into the chat gutter, so the
+   header card steps right (28px inset = 16px clear of the rail's edge) —
+   the sidebar keeps its geometry, the top bar does the adjusting. */
+[data-dsh-float] [data-dsh-frame][data-sidebar-collapsed] header {
+  margin-left: 28px;
 }
 
 /* ---------- Sidebar: header-style glass card. Light = neutral cool white
    (no green cast) with a luminous right edge; dark keeps its green-teal
    tint. ---------- */
 [data-dsh-float] [class*='sidebarCol'] {
+  position: relative;
+  /* Above the header card (8): the settings panel is a fixed overlay
+     trapped in this stacking context, so the sidebar itself must outrank
+     the header or the panel's top edge sits under the top bar. */
+  z-index: 9;
   margin: 12px;
   padding: 10px 12px 14px;
   border: 1px solid rgba(19, 45, 83, 0.26);
@@ -425,7 +464,7 @@
   background: var(--dsh-aqua-glass-card-light);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 8px 28px rgba(19, 45, 83, 0.1);
+    0 10px 34px rgba(19, 45, 83, 0.16);
   overflow: hidden;
 }
 
@@ -435,15 +474,27 @@
   background: var(--dsh-aqua-glass-card-dark);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 6px 24px rgba(2, 6, 14, 0.22);
+    0 8px 30px rgba(2, 6, 14, 0.32);
 }
 
-/* Collapsed rail: full-height glass strip, no floating margins. */
+/* Collapsed rail: floats too (mica mode). The rail keeps the app's own
+   geometry: the frame's grid track slides 256→56 (300ms) while the app
+   fades the frozen wide content out (150ms) — pinning a width here would
+   clip the outgoing content instantly and hide that fade. The floating gap
+   comes from a 12px left margin plus a matching negative right margin
+   (outer size unchanged — the main column does not move; the rail just
+   reaches 12px into the chat gutter). Top/bottom margins are 12px too,
+   aligning the rail with the header card's top and the composer's bottom.
+   Padding must be zeroed explicitly: the expanded rule's 12px horizontal
+   padding would otherwise shove the rail buttons out of the narrow column.
+   Compat mode has no data-dsh-float, so it keeps the stock rail untouched. */
 [data-dsh-float] [data-dsh-frame][data-sidebar-collapsed] [class*='sidebarCol'] {
-  margin: 0;
+  margin: 12px -12px 12px 12px;
   padding: 0;
-  border-radius: 0;
-  border-left: none;
+  border-radius: 16px;
+  /* The right margin rides the same clock as the fade, so the rail eases
+     into its floating spot as the wide content dissolves. */
+  transition: margin 150ms var(--ds-ease-in-out), border-radius 150ms var(--ds-ease-in-out);
 }
 
 /* The sidebar root freezes at the expanded column width via an inline
@@ -467,7 +518,7 @@
   background: var(--dsh-aqua-glass-card-light);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 8px 28px rgba(19, 45, 83, 0.1);
+    0 10px 34px rgba(19, 45, 83, 0.16);
   backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
   overflow: hidden;
 }
@@ -477,7 +528,7 @@
   background: var(--dsh-aqua-glass-card-dark);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 8px 28px rgba(2, 6, 14, 0.22);
+    0 8px 30px rgba(2, 6, 14, 0.32);
 }
 
 /* The toolbar and timeline surfaces go transparent so the glass shows through. */
@@ -497,27 +548,29 @@
 }
 
 [data-dsh-float] [data-dsh-stats] {
+  position: relative;
+  z-index: 8;
   width: calc(var(--dsh-chat-content-width) + 32px);
   max-width: none;
   margin: 0 auto;
   padding: 2px 16px;
   border: 1px solid rgba(19, 45, 83, 0.26);
-  border-top: 1px solid rgba(19, 45, 83, 0.12);
+  border-top: 1px solid rgba(19, 45, 83, 0.22);
   border-radius: 0 0 24px 24px;
   background: linear-gradient(180deg,
     color-mix(in srgb, rgb(255 255 255) calc(26% * var(--dsh-aqua-frost, 1)), transparent),
     color-mix(in srgb, rgb(255 255 255) calc(14% * var(--dsh-aqua-frost, 1)), transparent));
-  box-shadow: 0 8px 32px rgba(19, 45, 83, 0.12);
+  box-shadow: 0 10px 36px rgba(19, 45, 83, 0.16);
   backdrop-filter: blur(var(--dsh-aqua-blur, 14px));
 }
 
 [data-dsh-float] body[data-ds-dark-theme] [data-dsh-stats] {
   border-color: rgba(148, 180, 220, 0.32);
-  border-top-color: rgba(148, 180, 220, 0.16);
+  border-top-color: rgba(148, 180, 220, 0.3);
   background: linear-gradient(180deg,
     color-mix(in srgb, rgb(16 20 28) calc(60% * var(--dsh-aqua-frost, 1)), transparent),
     color-mix(in srgb, rgb(10 12 18) calc(60% * var(--dsh-aqua-frost, 1)), transparent));
-  box-shadow: 0 8px 32px rgba(2, 6, 14, 0.4);
+  box-shadow: 0 10px 36px rgba(2, 6, 14, 0.5);
 }
 
 /* ---------- Sidebar: the selected session gets an accent bar and a soft halo. ---------- */
@@ -550,24 +603,25 @@
 }
 
 /* ---------- Page edge fades: 5px gradient blur bands pinned to the top and
-   bottom of the viewport, ABOVE the chat content (z-index 9 > the header
-   card's 8) — content scrolling under an edge melts into a soft blur that
-   fades out across the band, with a faint scheme veil: a touch of white on
-   light, a touch of black on dark. Click-transparent, so nothing is
-   blocked. ---------- */
+   bottom of the viewport. They sit BELOW the floating glass (the header
+   card, composer card, and sidebar card hold z-index 8) but ABOVE the
+   scrolling chat content (z 7 > the code banner's 6) — content melting
+   into an edge passes under the blur, the glass itself stays sharp. A
+   faint scheme veil rides along: a touch of white on light, a touch of
+   black on dark. Click-transparent, so nothing is blocked. ---------- */
 [data-dsh-aqua] [data-dsh-aqua-fade] {
   position: fixed;
   left: 0;
   right: 0;
-  height: 40px;
-  z-index: 9;
+  height: 13px;
+  z-index: 7;
   pointer-events: none;
   backdrop-filter: blur(5px);
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.5);
 }
 
 [data-dsh-aqua] body[data-ds-dark-theme] [data-dsh-aqua-fade] {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.45);
 }
 
 [data-dsh-aqua] [data-dsh-aqua-fade='top'] {
