@@ -1,7 +1,6 @@
-/* Aqua row in the General settings section: controls that follow the
- * Appearance cubes directly (no row title of their own), same hairline
- * separator rhythm as the shipped rows; the section column strips the last
- * one. Nothing renders while the master switch is off. */
+/* Aqua controls block: one column of rows and knobs; the standalone `.group`
+ * carries the section hairline rhythm, the `.embedded` variant mounts inside
+ * the Plugins card's collapsible area. Nothing renders while off. */
 
 .group {
   display: flex;
@@ -9,6 +8,16 @@
   gap: 8px;
   padding: 8px 0 16px;
   border-bottom: 1px solid var(--dsw-alias-border-l2);
+}
+
+/* Embedded variant: opened up below the card head, separated by a hairline. */
+.embedded {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--dsw-alias-border-l2);
 }
 
 /* Controls stack: one column of rows and knobs. */

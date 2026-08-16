@@ -234,6 +234,14 @@ export interface AquaSettings {
   wallpaperBlur: number
   /** Wallpaper frost veil, 0-100. */
   wallpaperFrost: number
+  /** Wallpaper fit: cover (crop to fill), contain (letterbox), fill (stretch). */
+  wallpaperFit: 'cover' | 'contain' | 'fill'
+  /** Wallpaper zoom, 100-300 (% of the fitted size, around the focal point). */
+  wallpaperScale: number
+  /** Wallpaper focal-point X, 0-100 (%). */
+  wallpaperPosX: number
+  /** Wallpaper focal-point Y, 0-100 (%). */
+  wallpaperPosY: number
 }
 
 const SETTINGS_DEFAULTS: AquaSettings = {
@@ -248,6 +256,10 @@ const SETTINGS_DEFAULTS: AquaSettings = {
   critters: true,
   wallpaperBlur: 0,
   wallpaperFrost: 0,
+  wallpaperFit: 'cover',
+  wallpaperScale: 100,
+  wallpaperPosX: 50,
+  wallpaperPosY: 50,
 }
 
 /** Numeric knob keys and their localStorage names. */
@@ -258,21 +270,36 @@ const NUMERIC_KEYS = {
   bgBrightness: 'dsh.ui-aqua.bgBrightness',
   wallpaperBlur: 'dsh.ui-aqua.wallpaperBlur',
   wallpaperFrost: 'dsh.ui-aqua.wallpaperFrost',
+  wallpaperScale: 'dsh.ui-aqua.wallpaperScale',
+  wallpaperPosX: 'dsh.ui-aqua.wallpaperPosX',
+  wallpaperPosY: 'dsh.ui-aqua.wallpaperPosY',
 } as const
 type NumericKey = keyof typeof NUMERIC_KEYS
 
 const MODE_KEY = 'dsh.ui-aqua.mode'
 const BACKGROUND_KEY = 'dsh.ui-aqua.background'
 const WALLPAPER_KEY = 'dsh.ui-aqua.wallpaper'
+const WALLPAPER_FIT_KEY = 'dsh.ui-aqua.wallpaperFit'
 const WHALE_KEY = 'dsh.ui-aqua.whale'
 const CRITTERS_KEY = 'dsh.ui-aqua.critters'
 
+/** Numeric knob ranges (inclusive), per key. */
+const NUMERIC_RANGES: Record<NumericKey, { min: number; max: number }> = {
+  blur: { min: 0, max: 40 },
+  frost: { min: 0, max: 100 },
+  fluidHue: { min: 0, max: 360 },
+  bgBrightness: { min: 0, max: 100 },
+  wallpaperBlur: { min: 0, max: 40 },
+  wallpaperFrost: { min: 0, max: 100 },
+  wallpaperScale: { min: 100, max: 300 },
+  wallpaperPosX: { min: 0, max: 100 },
+  wallpaperPosY: { min: 0, max: 100 },
+}
+
 /** Clamp a numeric knob into its sane range. */
 function clampSetting(key: NumericKey, value: number): number {
-  const max = key === 'blur' || key === 'wallpaperBlur' ? 40
-    : key === 'frost' || key === 'wallpaperFrost' || key === 'bgBrightness' ? 100
-      : 360
-  return Number.isFinite(value) ? Math.min(max, Math.max(0, value)) : SETTINGS_DEFAULTS[key]
+  const { min, max } = NUMERIC_RANGES[key]
+  return Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : SETTINGS_DEFAULTS[key]
 }
 
 /** Read one numeric knob from localStorage (absent/parse failure means the default). */
@@ -346,6 +373,25 @@ function readWallpaper(): string {
 function writeWallpaper(value: string): void {
   try {
     localStorage.setItem(WALLPAPER_KEY, value)
+  } catch {
+    /* in-memory state still applies for this tab */
+  }
+}
+
+/** Read the wallpaper fit (absent/unknown means cover, the shipped look). */
+function readWallpaperFit(): 'cover' | 'contain' | 'fill' {
+  try {
+    const stored = localStorage.getItem(WALLPAPER_FIT_KEY)
+    return stored === 'contain' || stored === 'fill' ? stored : 'cover'
+  } catch {
+    return 'cover'
+  }
+}
+
+/** Persist the wallpaper fit. */
+function writeWallpaperFit(value: 'cover' | 'contain' | 'fill'): void {
+  try {
+    localStorage.setItem(WALLPAPER_FIT_KEY, value)
   } catch {
     /* in-memory state still applies for this tab */
   }
@@ -446,7 +492,7 @@ export class AquaLayer {
           this.sync()
         }
         const key = event.key
-        if (key !== null && (key in NUMERIC_KEYS || key === BACKGROUND_KEY || key === WALLPAPER_KEY || key === MODE_KEY || key === WHALE_KEY || key === CRITTERS_KEY)) {
+        if (key !== null && (key in NUMERIC_KEYS || key === BACKGROUND_KEY || key === WALLPAPER_KEY || key === WALLPAPER_FIT_KEY || key === MODE_KEY || key === WHALE_KEY || key === CRITTERS_KEY)) {
           this.reloadSettings()
           if (this.enabled) { this.applySettings(); this.applyTokens(); this.syncWhale() }
         }
@@ -474,11 +520,30 @@ export class AquaLayer {
     this.reloadSettings()
     this.dark = this.resolveScheme()
     this.sync()
+    // Adopt a host-stored wallpaper (original quality — e.g. picked in
+    // another browser) when this browser has none of its own.
+    if (this.settings.wallpaper === '') {
+      void this.probeHostWallpaper()
+    }
   }
 
   /** Current enable state (the settings row mirrors this). */
   getEnabled(): boolean {
     return this.enabled
+  }
+
+  /** Probe the host wallpaper store; adopt its URL when one exists. */
+  private async probeHostWallpaper(): Promise<void> {
+    try {
+      const res = await fetch('/aqua-wallpaper/current')
+      if (!res.ok) return
+      const data: unknown = await res.json()
+      if (typeof data !== 'object' || data === null) return
+      const { exists, url } = data as { exists?: unknown, url?: unknown }
+      if (exists === true && typeof url === 'string' && url !== '') this.setWallpaper(url)
+    } catch {
+      /* old host without the route: keep the empty state */
+    }
   }
 
   /** Current knob values (the settings row mirrors these). */
@@ -514,6 +579,10 @@ export class AquaLayer {
       critters: readCritters(),
       wallpaperBlur: readSetting('wallpaperBlur'),
       wallpaperFrost: readSetting('wallpaperFrost'),
+      wallpaperFit: readWallpaperFit(),
+      wallpaperScale: readSetting('wallpaperScale'),
+      wallpaperPosX: readSetting('wallpaperPosX'),
+      wallpaperPosY: readSetting('wallpaperPosY'),
     }
   }
 
@@ -618,6 +687,41 @@ export class AquaLayer {
     if (this.enabled) this.applySettings()
   }
 
+  /** Set the wallpaper fit (cover = crop-fill, contain = letterbox, fill = stretch). */
+  setWallpaperFit(value: 'cover' | 'contain' | 'fill'): void {
+    if (value === this.settings.wallpaperFit) return
+    this.settings.wallpaperFit = value
+    writeWallpaperFit(value)
+    if (this.enabled) this.applySettings()
+  }
+
+  /** Set the wallpaper zoom (100-300, % of the fitted size). */
+  setWallpaperScale(value: number): void {
+    const next = clampSetting('wallpaperScale', value)
+    if (next === this.settings.wallpaperScale) return
+    this.settings.wallpaperScale = next
+    writeSetting('wallpaperScale', next)
+    if (this.enabled) this.applySettings()
+  }
+
+  /** Set the wallpaper focal-point X (0-100, %; the crop/zoom anchor). */
+  setWallpaperPosX(value: number): void {
+    const next = clampSetting('wallpaperPosX', value)
+    if (next === this.settings.wallpaperPosX) return
+    this.settings.wallpaperPosX = next
+    writeSetting('wallpaperPosX', next)
+    if (this.enabled) this.applySettings()
+  }
+
+  /** Set the wallpaper focal-point Y (0-100, %; the crop/zoom anchor). */
+  setWallpaperPosY(value: number): void {
+    const next = clampSetting('wallpaperPosY', value)
+    if (next === this.settings.wallpaperPosY) return
+    this.settings.wallpaperPosY = next
+    writeSetting('wallpaperPosY', next)
+    if (this.enabled) this.applySettings()
+  }
+
   private sync(): void {
     if (this.enabled) this.mount()
     else this.unmount()
@@ -637,6 +741,13 @@ export class AquaLayer {
     style.setProperty('--dsh-aqua-fluid-hue', `${this.settings.fluidHue}deg`)
     style.setProperty('--dsh-aqua-wallpaper-blur', `${this.settings.wallpaperBlur}px`)
     style.setProperty('--dsh-aqua-wallpaper-frost', String(this.settings.wallpaperFrost / 100))
+    // Wallpaper fit: object-fit swaps the sizing strategy, object-position
+    // picks the focal point (which part of a cropped image stays visible),
+    // and transform scale zooms around that same point.
+    style.setProperty('--dsh-aqua-wallpaper-fit', this.settings.wallpaperFit)
+    style.setProperty('--dsh-aqua-wallpaper-scale', String(this.settings.wallpaperScale / 100))
+    style.setProperty('--dsh-aqua-wallpaper-pos-x', `${this.settings.wallpaperPosX}%`)
+    style.setProperty('--dsh-aqua-wallpaper-pos-y', `${this.settings.wallpaperPosY}%`)
     // Background brightness: dark mode darkens (0 = pure black, 50 = off),
     // light mode brightens (50 = off, 100 = pure white) — the knob's range
     // and the overlay direction both follow the resolved scheme.

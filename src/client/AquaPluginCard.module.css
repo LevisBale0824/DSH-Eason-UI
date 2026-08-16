@@ -1,6 +1,6 @@
 /* Aqua plugin card: one list item in the Plugins configurable tab — the
- * section's card language (rounded border, hairline, layer bg) holding only
- * the master switch. All knobs moved to the General settings' Appearance row. */
+ * section's card language (rounded border, hairline, layer bg) holding the
+ * master switch plus a collapse area with every glass knob. */
 
 .card {
   display: flex;
@@ -36,6 +36,53 @@
   font-size: 12px;
   line-height: 18px;
   color: var(--dsw-alias-label-tertiary);
+}
+
+/* Head actions: expand/collapse button + master toggle side by side. */
+.actions {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Expand/collapse ghost button with a rotating chevron. */
+.expand {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 14px;
+  background: transparent;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+  cursor: pointer;
+}
+
+.expand:hover:not(:disabled) {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.expand:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.chevron,
+.chevronOpen {
+  display: inline-flex;
+  justify-content: center;
+  width: 12px;
+  font-size: 10px;
+  line-height: 12px;
+  transition: transform 0.15s ease;
+}
+
+.chevronOpen {
+  transform: rotate(90deg);
 }
 
 /* Toggle button: ghost pill with a check cell, business blue when on. */

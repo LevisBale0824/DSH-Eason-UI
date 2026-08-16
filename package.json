@@ -1,7 +1,7 @@
 {
   "name": "@deepseek-ai/dsh-client-ui-aqua",
-  "description": "Aqua: a highly customizable glassmorphism theme for the Web surface — adjustable blur, frost, fluid or wallpaper backdrop, unified corners, and motion",
-  "version": "1.1.2",
+  "description": "Aqua: a highly customizable glassmorphism theme with a multi-pet desktop companion — adjustable blur, frost, fluid or wallpaper backdrop, unified corners, motion, and switchable pet packs (Eason first)",
+  "version": "1.5.0",
   "publishConfig": {
     "access": "public"
   },
@@ -29,6 +29,9 @@
     "./package.json": "./package.json"
   },
   "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
     "client": {
       "inject": [
         "@deepseek-ai/dsh-client-runtime",
@@ -43,7 +46,8 @@
   },
   "scripts": {
     "bundle": "tsdown",
-    "watch": "tsdown --watch"
+    "watch": "tsdown --watch",
+    "prepack": "node scripts/check-pets.mjs"
   },
   "license": "MIT",
   "peerDependencies": {
@@ -54,6 +58,8 @@
     "@deepseek-ai/dsh-client-ui-settings-plugins": "^0.1.0-rc.5",
     "@deepseek-ai/dsh-client-ui-slots": "^0.1.0-rc.5",
     "@deepseek-ai/dsh-client-ui-theme": "^0.1.0-rc.5",
+    "@deepseek-ai/dsh-home-paths": "^0.1.0-rc.6",
+    "@deepseek-ai/dsh-host-webserver": "^0.1.0-rc.6",
     "@deepseek-ai/dsh-invariants": "^0.1.0-rc.5",
     "@deepseek-ai/cordis": "^4.0.1",
     "react": "^18.2.0"
@@ -67,6 +73,8 @@
     "@deepseek-ai/dsh-client-ui-settings-plugins": "workspace:^",
     "@deepseek-ai/dsh-client-ui-slots": "workspace:^",
     "@deepseek-ai/dsh-client-ui-theme": "workspace:^",
+    "@deepseek-ai/dsh-home-paths": "workspace:^",
+    "@deepseek-ai/dsh-host-webserver": "workspace:^",
     "@deepseek-ai/dsh-invariants": "workspace:^",
     "@testing-library/react": "^16.1.0",
     "@types/react": "~18.3.1",
@@ -78,6 +86,8 @@
     "lib/index.js",
     "lib/invariant.js",
     "lib/client.js",
-    "lib/types/**/*.d.ts"
+    "lib/types/**/*.d.ts",
+    "assets/pets",
+    "cordis.patch.yml"
   ]
 }

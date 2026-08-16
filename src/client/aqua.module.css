@@ -141,7 +141,9 @@
 }
 
 /* Custom wallpaper: the backdrop-source knob swaps the fluid board for an
-   image. `object-fit: cover` fills the page while preserving aspect ratio;
+   image. The fit knob drives object-fit (cover = crop-fill, contain =
+   letterbox, fill = stretch), object-position picks the focal point (which
+   part of a cropped image stays visible), and transform scale zooms on top;
    the blur and frost knobs ride --dsh-aqua-wallpaper-blur / -frost. */
 [data-dsh-aqua] [data-dsh-aqua-wallpaper] {
   position: absolute;
@@ -152,7 +154,9 @@
 [data-dsh-aqua] [data-dsh-aqua-wallpaper-img] {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: var(--dsh-aqua-wallpaper-fit, cover);
+  object-position: var(--dsh-aqua-wallpaper-pos-x, 50%) var(--dsh-aqua-wallpaper-pos-y, 50%);
+  transform: scale(var(--dsh-aqua-wallpaper-scale, 1));
   filter: blur(var(--dsh-aqua-wallpaper-blur, 0px));
 }
 

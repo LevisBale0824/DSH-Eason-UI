@@ -1,0 +1,190 @@
+/* Wallpaper crop editor: a fixed overlay dialog. The crop frame (screen
+ * ratio) floats over the image; everything outside it is dimmed by the
+ * frame's spread shadow. Tokens follow the host design system so it reads
+ * native in both schemes. */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(4 8 14 / 0.55);
+  backdrop-filter: blur(4px);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  width: min(880px, 92vw);
+  height: min(620px, 82vh);
+  overflow: hidden;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 12px;
+  background: var(--dsw-alias-bg-layer-1);
+  box-shadow: var(--dsw-shadow-l3);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--dsw-alias-border-l2);
+}
+
+.title {
+  flex: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary);
+}
+
+.headerHint {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+/* The stage: the image pans under pointer drag; wheel zooms. */
+.body {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: rgb(8 12 20 / 0.6);
+}
+
+.stage {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.stage:active {
+  cursor: grabbing;
+}
+
+.img {
+  position: absolute;
+  max-width: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+/* Crop frame: screen-shaped; the spread shadow dims everything outside it. */
+.frame {
+  position: absolute;
+  pointer-events: none;
+  border: 1px dashed rgb(255 255 255 / 0.9);
+  box-shadow: 0 0 0 9999px rgb(4 8 14 / 0.55);
+}
+
+.sizeTag {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgb(4 8 14 / 0.7);
+  font-size: 11px;
+  line-height: 16px;
+  color: rgb(255 255 255 / 0.9);
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--dsw-alias-border-l2);
+}
+
+.zoomWrap {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.zoomLabel {
+  flex: none;
+  font-size: 12px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+.zoomSlider {
+  flex: 1;
+  min-width: 0;
+  accent-color: var(--dsw-alias-state-business-primary);
+}
+
+.zoomValue {
+  flex: none;
+  width: 40px;
+  font-size: 12px;
+  text-align: right;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.btn,
+.btnPrimary {
+  flex: none;
+  height: 28px;
+  padding: 0 14px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  background: transparent;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-primary);
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.btn:disabled,
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  border-color: transparent;
+  background: var(--dsw-alias-button-primary-fill);
+  color: var(--dsw-alias-label-primary-foreground);
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: var(--dsw-alias-button-primary-hover);
+}
+
+.unsupported {
+  padding: 8px 16px 10px;
+  border-top: 1px solid var(--dsw-alias-border-l2);
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-error, #e5484d);
+}

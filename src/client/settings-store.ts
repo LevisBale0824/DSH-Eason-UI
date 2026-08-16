@@ -33,6 +33,14 @@ export interface AquaRowState {
   wallpaperBlur: number
   /** Wallpaper frost veil, 0-100. */
   wallpaperFrost: number
+  /** Wallpaper fit: cover / contain / fill. */
+  wallpaperFit: 'cover' | 'contain' | 'fill'
+  /** Wallpaper zoom, 100-300. */
+  wallpaperScale: number
+  /** Wallpaper focal-point X, 0-100. */
+  wallpaperPosX: number
+  /** Wallpaper focal-point Y, 0-100. */
+  wallpaperPosY: number
   /** Monotonic revision; -1 until first sync so revision 0 lands as a change. */
   revision: number
 }
@@ -52,6 +60,10 @@ export interface AquaSettingsPayload {
   critters: boolean
   wallpaperBlur: number
   wallpaperFrost: number
+  wallpaperFit: 'cover' | 'contain' | 'fill'
+  wallpaperScale: number
+  wallpaperPosX: number
+  wallpaperPosY: number
 }
 
 /** Declared action shape giving the exported factory a stable return type. */
@@ -79,6 +91,10 @@ export function createAquaRowStore(): EngineStoreHandle<AquaRowState, AquaRowAct
       critters: true,
       wallpaperBlur: 0,
       wallpaperFrost: 0,
+      wallpaperFit: 'cover',
+      wallpaperScale: 100,
+      wallpaperPosX: 50,
+      wallpaperPosY: 50,
       revision: -1,
     }),
     actions: {
@@ -97,6 +113,10 @@ export function createAquaRowStore(): EngineStoreHandle<AquaRowState, AquaRowAct
         d.critters = next.critters
         d.wallpaperBlur = next.wallpaperBlur
         d.wallpaperFrost = next.wallpaperFrost
+        d.wallpaperFit = next.wallpaperFit
+        d.wallpaperScale = next.wallpaperScale
+        d.wallpaperPosX = next.wallpaperPosX
+        d.wallpaperPosY = next.wallpaperPosY
         d.revision = revision
       },
     },
